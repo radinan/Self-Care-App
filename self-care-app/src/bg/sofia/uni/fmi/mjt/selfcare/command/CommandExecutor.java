@@ -36,7 +36,7 @@ public class CommandExecutor {
             case GET_QUOTE -> getQuote();
             case CHECK_MOOD -> checkMood();
 
-//            default -> throw new Exception();
+            default -> "Invalid";
         };
     }
 
@@ -45,8 +45,15 @@ public class CommandExecutor {
     }
 
     private String register(String arguments) {
-        // separate USERNAME, PASSWORD
-        // validate
+        String[] separatedArguments = arguments.split(" ");
+        if (separatedArguments.length != 2) {
+//            throw new Exception();
+        }
+
+        String username = separatedArguments[0];
+        String password = separatedArguments[1];
+        //validate
+
 
         //check credentials.txt
         // read lines by 2;
