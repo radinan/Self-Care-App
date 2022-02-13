@@ -17,23 +17,30 @@ public class Main {
         //read every line and sout it
         try (Reader fr = new FileReader(Path.of("./credentials.txt").toString());
              BufferedReader reader = new BufferedReader(fr)) {
+
+            String username;
+            String password;
             String currentLine;
-            while ((currentLine = reader.readLine()) != null) {
-                System.out.println(currentLine);
+            while ((username = reader.readLine()) != null && (password = reader.readLine()) != null) {
+                if (username.equals("user5")) {
+                    System.out.println("Already exists");
+                    break;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //append username and password
-        try (Writer fw = new FileWriter(Path.of("./credentials.txt").toString(), true);
-             BufferedWriter bw = new BufferedWriter(fw)) {
-            bw.write("user1");
-            bw.newLine();
-            bw.write("password1");
-            bw.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        //append username and password
+//        try (Writer fw = new FileWriter(Path.of("./credentials.txt").toString(), true);
+//             BufferedWriter bw = new BufferedWriter(fw)) {
+//
+//            bw.write("user3");
+//            bw.newLine();
+//            bw.write("user5");
+//            bw.newLine();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }

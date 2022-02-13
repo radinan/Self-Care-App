@@ -1,4 +1,9 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 //make it builder
 public class CommandExecutor {
     //think of getting them in an enum
@@ -49,23 +54,75 @@ public class CommandExecutor {
         if (separatedArguments.length != 2) {
 //            throw new Exception();
         }
-
         String username = separatedArguments[0];
         String password = separatedArguments[1];
         //validate
 
 
-        //check credentials.txt
-        // read lines by 2;
-            //check 1st == USERNAME
-            //yes -> "This username is already taken"
-        //append USERNAME\nPASSWORD
-            // -> "Successfully registered" (auto login)
-        return null;
+        try {
+            Files.createFile(Path.of("./credentials.txt"));
+        } catch (Exception ignored) {
+            //log?
+        }
+
+        //read every line
+        try (Reader fr = new FileReader(Path.of("./credentials.txt").toString());
+             BufferedReader reader = new BufferedReader(fr)) {
+
+            String usernameFile;
+            String passwordFile;
+            while ((usernameFile = reader.readLine()) != null &&
+                    (passwordFile = reader.readLine()) != null) {
+                if (usernameFile.equals(username)) {
+                    return "Username already exists.";
+                }
+            }
+
+            //append username and password
+            try (Writer fw = new FileWriter(Path.of("./credentials.txt").toString(), true);
+                 BufferedWriter bw = new BufferedWriter(fw)) {
+
+                bw.write(username);
+                bw.newLine();
+
+                bw.write(password);
+                bw.newLine();
+                //indicate login
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "Successfully registered.";
     }
 
     private String login(String arguments) {
-        return null;
+        String[] separatedArguments = arguments.split(" ");
+        if (separatedArguments.length != 2) {
+//            throw new Exception();
+        }
+        String username = separatedArguments[0];
+        String password = separatedArguments[1];
+        //validate
+
+        try (Reader fr = new FileReader(Path.of("./credentials.txt").toString());
+             BufferedReader reader = new BufferedReader(fr)) {
+
+            String usernameFile;
+            String passwordFile;
+            while ((usernameFile = reader.readLine()) != null &&
+                    (passwordFile = reader.readLine()) != null) {
+                if (usernameFile.equals(username) && passwordFile.equals(password)) {
+                    //indicate login
+                    return "Successfully logged in";
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Incorrect credentials.";
     }
 
     private String createJournal(String arguments) {
