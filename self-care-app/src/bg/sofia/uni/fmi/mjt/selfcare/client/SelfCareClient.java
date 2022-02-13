@@ -20,19 +20,19 @@ public class SelfCareClient {
             System.out.println("Connected to the server");
 
             while (true) {
-                System.out.println("Enter message");
+                System.out.print("Enter command: ");
                 String message = scanner.nextLine();
 
                 if ("quit".equals(message)) {
                     break;
                 }
 
-//                System.out.println("Sending message <" + message + "> to the server.");
-//
-//                writer.println(message);
-//
-//                String reply = reader.readLine();
-//                System.out.println("Server replied <" + reply + ">.");
+                System.out.println("Sending <" + message + "> to the server.");
+
+                writer.println(message);
+
+                String reply = reader.readLine();
+                System.out.println("Server replied <" + reply + ">.");
             }
 
         } catch (IOException e) {
