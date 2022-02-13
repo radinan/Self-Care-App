@@ -72,6 +72,7 @@ public class CommandExecutor {
 
             String usernameFile;
             String passwordFile;
+
             while ((usernameFile = br.readLine()) != null && (passwordFile = br.readLine()) != null) {
                 if (usernameFile.equals(username)) {
                     return "Username already exists.";
@@ -108,12 +109,10 @@ public class CommandExecutor {
 
             String usernameFile;
             String passwordFile;
-            while ((usernameFile = reader.readLine()) != null &&
-                    (passwordFile = reader.readLine()) != null) {
+            while ((usernameFile = reader.readLine()) != null && (passwordFile = reader.readLine()) != null) {
                 if (usernameFile.equals(username) && passwordFile.equals(password)) {
-
                     currentUser.setUsername(username);
-                    currentUser.login();
+                    currentUser.login(); //separate method
                     return "Successfully logged in";
                 }
             }
@@ -159,4 +158,8 @@ public class CommandExecutor {
         return null;
     }
 
+    private void loadUser(String username) {
+        Path path = Path.of("./users/" + username + ".txt");
+//        if ()
+    }
 }
