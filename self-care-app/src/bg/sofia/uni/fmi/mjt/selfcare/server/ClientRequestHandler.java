@@ -22,6 +22,7 @@ public class ClientRequestHandler implements Runnable {
             String inputLine;
 
             while ((inputLine = in.readLine()) != null) {
+                //calls Command...
                 System.out.println("Message received from the client: " + inputLine);
                 out.println("!Echo! " + inputLine);
             }

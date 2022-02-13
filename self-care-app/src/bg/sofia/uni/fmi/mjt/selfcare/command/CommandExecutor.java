@@ -1,5 +1,5 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
-
+//make it builder
 public class CommandExecutor {
     //think of getting them in an enum
     private final String REGISTER = "register";
@@ -19,8 +19,8 @@ public class CommandExecutor {
 
     }
 
-    public void execute(Command command) {
-        switch (command.name()) {
+    public String execute(Command command) {
+        return switch (command.name()) {
             case DISCONNECT -> disconnect();
             case REGISTER -> register(command.arguments());
             case LOGIN -> login(command.arguments());
@@ -35,43 +35,66 @@ public class CommandExecutor {
 
             case GET_QUOTE -> getQuote();
             case CHECK_MOOD -> checkMood();
-        }
+
+//            default -> throw new Exception();
+        };
     }
 
-    private void disconnect() {
+    private String disconnect() {
+        return "Disconnected.";
     }
 
-    private void register(String arguments) {
+    private String register(String arguments) {
+        // separate USERNAME, PASSWORD
+        // validate
+
+        //check credentials.txt
+        // read lines by 2;
+            //check 1st == USERNAME
+            //yes -> "This username is already taken"
+        //append USERNAME\nPASSWORD
+            // -> "Successfully registered" (auto login)
+        return null;
     }
 
-    private void login(String arguments) {
+    private String login(String arguments) {
+        return null;
     }
 
-    private void createJournal(String arguments) {
+    private String createJournal(String arguments) {
+        return null;
     }
 
-    private void listAllJournals(String arguments) {
+    private String listAllJournals(String arguments) {
+        return null;
     }
 
-    private void findByTitle(String arguments) {
+    private String findByTitle(String arguments) {
+        return null;
     }
 
-    private void findByKeywords(String arguments) {
+    private String findByKeywords(String arguments) {
+        return null;
     }
 
-    private void findByDate(String arguments) {
+    private String findByDate(String arguments) {
+        return null;
     }
 
-    private void sortByTitle(String arguments) {
+    private String sortByTitle(String arguments) {
+        return null;
     }
 
-    private void sortByDate(String arguments) {
+    private String sortByDate(String arguments) {
+        return null;
     }
 
-    private void getQuote() {
+    private String getQuote() {
+        return null;
     }
 
-    private void checkMood() {
+    private String checkMood() {
+        return null;
     }
 
 }
