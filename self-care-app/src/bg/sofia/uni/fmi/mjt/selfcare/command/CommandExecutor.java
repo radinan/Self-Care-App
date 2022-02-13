@@ -1,5 +1,7 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
+import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,11 +22,14 @@ public class CommandExecutor {
     private final String GET_QUOTE = "get-quote";
     private final String CHECK_MOOD = "check-mood";
 
+    private User currentUser;
+
     public CommandExecutor() {
 
     }
 
-    public String execute(Command command) {
+    public String execute(Command command, User user) {
+        currentUser = user;
         return switch (command.name()) {
             case DISCONNECT -> disconnect();
             case REGISTER -> register(command.arguments());
@@ -50,13 +55,9 @@ public class CommandExecutor {
     }
 
     private String register(String arguments) {
-        String[] separatedArguments = arguments.split(" ");
-        if (separatedArguments.length != 2) {
-//            throw new Exception();
-        }
+        String[] separatedArguments = CommandParser.parseCredentials(arguments);
         String username = separatedArguments[0];
         String password = separatedArguments[1];
-        //validate
 
 
         try {
@@ -65,14 +66,13 @@ public class CommandExecutor {
             //log?
         }
 
-        //read every line
+        //check if username exists
         try (Reader fr = new FileReader(Path.of("./credentials.txt").toString());
-             BufferedReader reader = new BufferedReader(fr)) {
+             BufferedReader br = new BufferedReader(fr)) {
 
             String usernameFile;
             String passwordFile;
-            while ((usernameFile = reader.readLine()) != null &&
-                    (passwordFile = reader.readLine()) != null) {
+            while ((usernameFile = br.readLine()) != null && (passwordFile = br.readLine()) != null) {
                 if (usernameFile.equals(username)) {
                     return "Username already exists.";
                 }
@@ -87,9 +87,9 @@ public class CommandExecutor {
 
                 bw.write(password);
                 bw.newLine();
-                //indicate login
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                currentUser.setUsername(username);
+                currentUser.login();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,13 +99,9 @@ public class CommandExecutor {
     }
 
     private String login(String arguments) {
-        String[] separatedArguments = arguments.split(" ");
-        if (separatedArguments.length != 2) {
-//            throw new Exception();
-        }
+        String[] separatedArguments = CommandParser.parseCredentials(arguments);
         String username = separatedArguments[0];
         String password = separatedArguments[1];
-        //validate
 
         try (Reader fr = new FileReader(Path.of("./credentials.txt").toString());
              BufferedReader reader = new BufferedReader(fr)) {
@@ -115,7 +111,9 @@ public class CommandExecutor {
             while ((usernameFile = reader.readLine()) != null &&
                     (passwordFile = reader.readLine()) != null) {
                 if (usernameFile.equals(username) && passwordFile.equals(password)) {
-                    //indicate login
+
+                    currentUser.setUsername(username);
+                    currentUser.login();
                     return "Successfully logged in";
                 }
             }

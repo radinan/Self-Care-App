@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SelfCareServer {
+    //map socket-user
     private static final int SERVER_PORT = 4444;
     private static final int MAX_EXECUTOR_THREADS = 10;
 
