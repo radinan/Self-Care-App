@@ -36,4 +36,12 @@ public class User {
         return journals;
     }
 
+    public void setJournals(List<Journal> journals) {
+        this.journals = journals;
+    }
+
+    public void addJournal(Journal journal) {
+        journals.add(journal);
+    }
+
 }

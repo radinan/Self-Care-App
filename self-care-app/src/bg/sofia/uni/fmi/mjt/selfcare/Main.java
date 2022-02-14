@@ -47,12 +47,13 @@ public class Main {
 ////            e.printStackTrace();
 ////        }
 
-        try {
+        //Serialization is a bad idea. Appending is corrupting the file
+  /*      try {
             Files.createFile(Path.of("./user1.txt"));
         } catch (Exception ignored) {
             //log?
         }
-        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream("./user1.txt"))) {
+        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream("./user1.txt", true))) {
             Journal journal = new Journal("hi", "hello");
             Journal journal1 = new Journal("zaglavie1", "1tova e moeto sydyrjanie1");
             Journal journal2 = new Journal("zaglavie2", "2tova e moeto sydyrjanie2");
@@ -64,6 +65,7 @@ public class Main {
             for (Journal j : journals) {
                 os.writeObject(j);
             }
+            os.reset();
 
 //            journals.stream().forEach(o -> {
 //                try {
@@ -73,6 +75,7 @@ public class Main {
 //                }
 //            });
         } catch (Exception ignored) {
+            ignored.printStackTrace();
             System.out.printf("NE syshtesvuva");
         }
 
@@ -83,8 +86,8 @@ public class Main {
                 j.add(curr);
             }
         } catch (Exception ignored) {
-            System.out.printf("NE syshtesvuva");
+            System.out.printf("tuk reve");
         }
-        System.out.println();
+        System.out.println();*/
     }
 }

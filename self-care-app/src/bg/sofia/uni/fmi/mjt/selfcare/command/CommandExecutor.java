@@ -1,11 +1,15 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
+import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
+//make class for initial files creation
 //make it builder
 public class CommandExecutor {
     //think of getting them in an enum
@@ -88,19 +92,17 @@ public class CommandExecutor {
 
                 bw.write(password);
                 bw.newLine();
-
-                currentUser.setUsername(username);
-                currentUser.login();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //rethrow
         }
 
+        loadUser(username);
         return "Successfully registered.";
     }
 
     private String login(String arguments) {
-        String[] separatedArguments = CommandParser.parseCredentials(arguments);
+        String[] separatedArguments = CommandParser.parseCredentials(arguments); //make it a user-pass pair
         String username = separatedArguments[0];
         String password = separatedArguments[1];
 
@@ -111,8 +113,7 @@ public class CommandExecutor {
             String passwordFile;
             while ((usernameFile = reader.readLine()) != null && (passwordFile = reader.readLine()) != null) {
                 if (usernameFile.equals(username) && passwordFile.equals(password)) {
-                    currentUser.setUsername(username);
-                    currentUser.login(); //separate method
+                    loadUser(username);
                     return "Successfully logged in";
                 }
             }
@@ -123,6 +124,12 @@ public class CommandExecutor {
     }
 
     private String createJournal(String arguments) {
+        //<title> <content>
+        Journal journal = CommandParser.parseJournal(arguments);
+        Path path = Path.of("./users/" + currentUser.getUsername() + ".txt");
+
+        //make it store data in a ??????????? csv format, separated by | ???????????????????????????
+        
         return null;
     }
 
@@ -159,7 +166,24 @@ public class CommandExecutor {
     }
 
     private void loadUser(String username) {
+        currentUser.setUsername(username);
+        currentUser.login();
+
         Path path = Path.of("./users/" + username + ".txt");
-//        if ()
+
+        if (Files.exists(path)) {
+            List<Journal> fileJournals = new ArrayList<>();
+
+            try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(path.toString()))) {
+                Journal currentJournal;
+                while ((currentJournal = (Journal) is.readObject()) != null) {
+                    fileJournals.add(currentJournal);
+                }
+            } catch (Exception e) {
+                e.printStackTrace(); //change "Unavailable service"
+            }
+
+            currentUser.setJournals(fileJournals);
+        }
     }
 }
