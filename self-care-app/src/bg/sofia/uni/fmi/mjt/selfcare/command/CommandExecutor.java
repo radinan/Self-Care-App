@@ -51,7 +51,6 @@ public class CommandExecutor {
             case SORT_BY_DATE -> sortByDate(command.arguments());
 
             case GET_QUOTE -> getQuote();
-//            case CHECK_MOOD -> checkMood();
 
             default -> "Invalid";
         };
@@ -148,20 +147,23 @@ public class CommandExecutor {
     }
 
     private String sortByTitle(String arguments) {
-        return null;
+        String delimiter = ",\n";
+        return currentUser.getJournals().stream()
+                .sorted(Comparator.comparing(Journal::getTitle))
+                .map(Journal::toString)
+                .collect(Collectors.joining(delimiter));
     }
 
     private String sortByDate(String arguments) {
-        return null;
-    }
+        String delimiter = ",\n";
+        return currentUser.getJournals().stream()
+                .sorted((Comparator.comparing(Journal::getCreationDate)))
+                .map(Journal::toString)
+                .collect(Collectors.joining(delimiter));    }
 
     private String getQuote() {
         return null;
     }
-
-//    private String checkMood() {
-//        return null;
-//    }
 
     private void loadUser(String username) {
         currentUser.setUsername(username);
