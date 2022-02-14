@@ -43,7 +43,7 @@ public class CommandExecutor {
             case LOGIN -> login(command.arguments());
 
             case CREATE_JOURNAL -> createJournal(command.arguments());
-            case LIST_ALL_JOURNALS -> listAllJournals();
+            case LIST_ALL_JOURNALS -> listAllJournalsTitle();
             case FIND_BY_TITLE -> findByTitle(command.arguments());
             case FIND_BY_KEYWORDS -> findByKeywords(command.arguments());
             case FIND_BY_DATE -> findByDate(command.arguments());
@@ -97,7 +97,7 @@ public class CommandExecutor {
         return "Success";
     }
 
-    private String listAllJournals() {
+    private String listAllJournalsTitle() {
         String delimiter = ", ";
         return currentUser.getJournals().stream()
                 .map(Journal::getTitle)
@@ -125,7 +125,9 @@ public class CommandExecutor {
                     .toList();
 
             Long matchCount = keywords.stream().filter(contentWords::contains).count();
-            journalPairs.add(new AbstractMap.SimpleEntry<>(matchCount, journal));
+            if (matchCount > 0) {
+                journalPairs.add(new AbstractMap.SimpleEntry<>(matchCount, journal));
+            }
         }
 
         String delimiter = ",\n";
@@ -147,6 +149,7 @@ public class CommandExecutor {
     }
 
     private String sortByTitle(String arguments) {
+        //parse sort arguments
         String delimiter = ",\n";
         return currentUser.getJournals().stream()
                 .sorted(Comparator.comparing(Journal::getTitle))
@@ -155,11 +158,20 @@ public class CommandExecutor {
     }
 
     private String sortByDate(String arguments) {
+        //parse sort arguments
         String delimiter = ",\n";
-        return currentUser.getJournals().stream()
-                .sorted((Comparator.comparing(Journal::getCreationDate)))
-                .map(Journal::toString)
-                .collect(Collectors.joining(delimiter));    }
+        if (arguments.equals("asc")) {
+            return currentUser.getJournals().stream()
+                    .sorted((Comparator.comparing(Journal::getCreationDate)))
+                    .map(Journal::toString)
+                    .collect(Collectors.joining(delimiter));
+        } else {
+            return currentUser.getJournals().stream()
+                    .sorted((Comparator.comparing(Journal::getCreationDate)).reversed())
+                    .map(Journal::toString)
+                    .collect(Collectors.joining(delimiter));
+        }
+    }
 
     private String getQuote() {
         return null;

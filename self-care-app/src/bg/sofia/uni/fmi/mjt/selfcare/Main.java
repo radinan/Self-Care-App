@@ -1,5 +1,6 @@
 package bg.sofia.uni.fmi.mjt.selfcare;
 
+import bg.sofia.uni.fmi.mjt.selfcare.command.CommandParser;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 
 import java.io.*;
@@ -7,8 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -92,15 +93,65 @@ public class Main {
         System.out.println();*/
 
         List<Journal> list = new ArrayList<>();
-        list.add(new Journal("aa", "aa aa aa"));
-        list.add(new Journal("bb", "aa bb aa"));
-        list.add(new Journal("cc", "aa aa cc"));
+        list.add(new Journal("aabc", LocalDate.of(2020,12,1), "aa"));
+        list.add(new Journal("aabb", LocalDate.of(2020, 12, 1) ,"aa bb aa"));
+        list.add(new Journal("cc", LocalDate.of(2022, 12, 1), "of"));
 
-        String argument = "aa";
-        String s = list.stream().filter(o -> o.getTitle().equals(argument))
-                .map(Journal::toString)
-                .collect(Collectors.joining(",\n"));
+////listAllJournalsTitle
+//        String s = list.stream()
+//                .map(Journal::getTitle)
+//                .collect(Collectors.joining(", "));
 
-        System.out.println(s);
+//        //findByTitle
+//        String title = "bb";
+//        String s = list.stream()
+//                .filter(o -> o.getTitle().equals(title))
+//                .map(Journal::toString)
+//                .collect(Collectors.joining(",\n"));
+
+//        //findByKeywords
+//        List<String> keywords = new ArrayList<>();
+//        keywords.add("aa");
+//        keywords.add("bb");
+//        List<Map.Entry<Long, Journal>> journalPairs = new ArrayList<>();
+//
+//        for (Journal journal : list) {
+//            String separatorRegex = "[\\p{IsPunctuation}\\p{IsWhite_Space}]+";
+//
+//            List<String> contentWords = Arrays.stream(journal.getContent().split(separatorRegex))
+//                    .distinct()
+//                    .toList();
+//
+//            Long matchCount = keywords.stream().filter(contentWords::contains).count();
+//            if (matchCount > 0) {
+//                journalPairs.add(new AbstractMap.SimpleEntry<>(matchCount, journal));
+//            }
+//        }
+//
+//        String delimiter = ",\n";
+//        String s = journalPairs.stream()
+//                .sorted(Map.Entry.<Long, Journal>comparingByKey().reversed())
+//                .map(Map.Entry::getValue)
+//                .map(Journal::toString)
+//                .collect(Collectors.joining(delimiter));
+
+//        //findByDate
+//        String s = list.stream()
+//                .filter(o -> o.getCreationDate().equals(LocalDate.of(2020,12,1)))
+//                .map(Journal::toString)
+//                .collect(Collectors.joining(",\n"));
+
+//        //sortByTitle
+//        String s = list.stream()
+//                .sorted(Comparator.comparing(Journal::getTitle))
+//                .map(Journal::toString)
+//                .collect(Collectors.joining(",\n"));
+
+//        //sortByDate
+//        String s = list.stream()
+//                .sorted((Comparator.comparing(Journal::getCreationDate)).reversed())
+//                .map(Journal::toString)
+//                .collect(Collectors.joining(",\n"));
+//        System.out.println(s);
     }
 }
