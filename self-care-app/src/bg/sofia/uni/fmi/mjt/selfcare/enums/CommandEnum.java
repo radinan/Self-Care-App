@@ -1,4 +1,4 @@
-package bg.sofia.uni.fmi.mjt.selfcare.command;
+package bg.sofia.uni.fmi.mjt.selfcare.enums;
 
 public enum CommandEnum {
 /*    REGISTER("register"),

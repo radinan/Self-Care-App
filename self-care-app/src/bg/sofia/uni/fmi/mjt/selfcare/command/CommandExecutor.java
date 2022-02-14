@@ -1,13 +1,15 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
+import bg.sofia.uni.fmi.mjt.selfcare.utilities.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 //make class for initial files creation
 //make it builder
@@ -27,12 +29,13 @@ public class CommandExecutor {
     private final String CHECK_MOOD = "check-mood";
 
     private User currentUser;
+    private FileEditor fileEditor;
 
     public CommandExecutor() {
-
+        fileEditor = new FileEditor();
     }
 
-    public String execute(Command command, User user) {
+    public String execute(Command command, User user) { //enum responses?
         currentUser = user;
         return switch (command.name()) {
             case DISCONNECT -> disconnect();
@@ -40,7 +43,7 @@ public class CommandExecutor {
             case LOGIN -> login(command.arguments());
 
             case CREATE_JOURNAL -> createJournal(command.arguments());
-            case LIST_ALL_JOURNALS -> listAllJournals(command.arguments());
+            case LIST_ALL_JOURNALS -> listAllJournals();
             case FIND_BY_TITLE -> findByTitle(command.arguments());
             case FIND_BY_KEYWORDS -> findByKeywords(command.arguments());
             case FIND_BY_DATE -> findByDate(command.arguments());
@@ -48,7 +51,7 @@ public class CommandExecutor {
             case SORT_BY_DATE -> sortByDate(command.arguments());
 
             case GET_QUOTE -> getQuote();
-            case CHECK_MOOD -> checkMood();
+//            case CHECK_MOOD -> checkMood();
 
             default -> "Invalid";
         };
@@ -59,94 +62,89 @@ public class CommandExecutor {
     }
 
     private String register(String arguments) {
+        String[] separatedArguments = CommandParser.parseCredentials(arguments); //make it return a pair
+        String username = separatedArguments[0];
+        String password = separatedArguments[1];
+
+        if (fileEditor.isUsernameFree(username)) {
+            fileEditor.addNewUser(username, password);
+            loadUser(username);
+            return "Successfully registered.";
+        } else {
+            //exception?
+            return "Username is taken";
+        }
+    }
+
+    private String login(String arguments) {
         String[] separatedArguments = CommandParser.parseCredentials(arguments);
         String username = separatedArguments[0];
         String password = separatedArguments[1];
 
-
-        try {
-            Files.createFile(Path.of("./credentials.txt"));
-        } catch (Exception ignored) {
-            //log?
+        if (fileEditor.areCredentialsCorrect(username, password)) {
+            loadUser(username);
+            return "Successfully logged in";
+        } else {
+            //exception?
+            return "Incorrect credentials.";
         }
-
-        //check if username exists
-        try (Reader fr = new FileReader(Path.of("./credentials.txt").toString());
-             BufferedReader br = new BufferedReader(fr)) {
-
-            String usernameFile;
-            String passwordFile;
-
-            while ((usernameFile = br.readLine()) != null && (passwordFile = br.readLine()) != null) {
-                if (usernameFile.equals(username)) {
-                    return "Username already exists.";
-                }
-            }
-
-            //append username and password
-            try (Writer fw = new FileWriter(Path.of("./credentials.txt").toString(), true);
-                 BufferedWriter bw = new BufferedWriter(fw)) {
-
-                bw.write(username);
-                bw.newLine();
-
-                bw.write(password);
-                bw.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace(); //rethrow
-        }
-
-        loadUser(username);
-        return "Successfully registered.";
-    }
-
-    private String login(String arguments) {
-        String[] separatedArguments = CommandParser.parseCredentials(arguments); //make it a user-pass pair
-        String username = separatedArguments[0];
-        String password = separatedArguments[1];
-
-        try (Reader fr = new FileReader(Path.of("./credentials.txt").toString());
-             BufferedReader reader = new BufferedReader(fr)) {
-
-            String usernameFile;
-            String passwordFile;
-            while ((usernameFile = reader.readLine()) != null && (passwordFile = reader.readLine()) != null) {
-                if (usernameFile.equals(username) && passwordFile.equals(password)) {
-                    loadUser(username);
-                    return "Successfully logged in";
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "Incorrect credentials.";
     }
 
     private String createJournal(String arguments) {
-        //<title> <content>
         Journal journal = CommandParser.parseJournal(arguments);
-        Path path = Path.of("./users/" + currentUser.getUsername() + ".txt");
+        fileEditor.addNewJournal(currentUser.getUsername(), journal);
+        currentUser.addJournal(journal);
 
-        //make it store data in a ??????????? csv format, separated by | ???????????????????????????
-        
-        return null;
+        return "Success";
     }
 
-    private String listAllJournals(String arguments) {
-        return null;
+    private String listAllJournals() {
+        String delimiter = ", ";
+        return currentUser.getJournals().stream()
+                .map(Journal::getTitle)
+                .collect(Collectors.joining(delimiter));
     }
 
-    private String findByTitle(String arguments) {
-        return null;
+    private String findByTitle(String argument) {
+        String delimiter = ",\n";
+        //parse and validate
+        return currentUser.getJournals().stream()
+                .filter(o -> o.getTitle().equals(argument))
+                .map(Journal::toString)
+                .collect(Collectors.joining(delimiter));
     }
 
     private String findByKeywords(String arguments) {
-        return null;
+        List<String> keywords = CommandParser.parseKeywords(arguments);
+        List<Map.Entry<Long, Journal>> journalPairs = new ArrayList<>();
+
+        for (Journal journal : currentUser.getJournals()) {
+            String separatorRegex = "[\\p{IsPunctuation}\\p{IsWhite_Space}]+";
+
+            List<String> contentWords = Arrays.stream(journal.getContent().split(separatorRegex))
+                    .distinct()
+                    .toList();
+
+            Long matchCount = keywords.stream().filter(contentWords::contains).count();
+            journalPairs.add(new AbstractMap.SimpleEntry<>(matchCount, journal));
+        }
+
+        String delimiter = ",\n";
+        return journalPairs.stream()
+                .sorted(Map.Entry.<Long, Journal>comparingByKey().reversed())
+                .map(Map.Entry::getValue)
+                .map(Journal::toString)
+                .collect(Collectors.joining(delimiter));
     }
 
-    private String findByDate(String arguments) {
-        return null;
+    private String findByDate(String argument) {
+        LocalDate creationDate = LocalDate.parse(argument);
+        //parse and validate
+        String delimiter = ",\n";
+        return currentUser.getJournals().stream()
+                .filter(o -> o.getCreationDate().equals(creationDate))
+                .map(Journal::toString)
+                .collect(Collectors.joining(delimiter));
     }
 
     private String sortByTitle(String arguments) {
@@ -161,9 +159,9 @@ public class CommandExecutor {
         return null;
     }
 
-    private String checkMood() {
-        return null;
-    }
+//    private String checkMood() {
+//        return null;
+//    }
 
     private void loadUser(String username) {
         currentUser.setUsername(username);

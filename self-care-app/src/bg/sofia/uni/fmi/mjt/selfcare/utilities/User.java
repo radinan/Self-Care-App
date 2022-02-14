@@ -1,5 +1,6 @@
 package bg.sofia.uni.fmi.mjt.selfcare.utilities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -8,7 +9,9 @@ public class User {
     private List<Journal> journals;
 
     public User() {
+        username = null;
         isLogged = false;
+        journals = new ArrayList<>();
     }
 
     public User(String username, List<Journal> journals) {
@@ -32,12 +35,12 @@ public class User {
         return  username;
     }
 
-    public List<Journal> getJournals() {
-        return journals;
-    }
-
     public void setJournals(List<Journal> journals) {
         this.journals = journals;
+    }
+
+    public List<Journal> getJournals() {
+        return journals;
     }
 
     public void addJournal(Journal journal) {

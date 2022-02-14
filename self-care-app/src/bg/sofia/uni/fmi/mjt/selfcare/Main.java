@@ -9,6 +9,7 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -89,5 +90,17 @@ public class Main {
             System.out.printf("tuk reve");
         }
         System.out.println();*/
+
+        List<Journal> list = new ArrayList<>();
+        list.add(new Journal("aa", "aa aa aa"));
+        list.add(new Journal("bb", "aa bb aa"));
+        list.add(new Journal("cc", "aa aa cc"));
+
+        String argument = "aa";
+        String s = list.stream().filter(o -> o.getTitle().equals(argument))
+                .map(Journal::toString)
+                .collect(Collectors.joining(",\n"));
+
+        System.out.println(s);
     }
 }
