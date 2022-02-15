@@ -4,6 +4,10 @@ import bg.sofia.uni.fmi.mjt.selfcare.command.CommandParser;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 
 import java.io.*;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
@@ -143,19 +147,19 @@ public class Main {
 //                .collect(Collectors.joining(",\n"));
 
 //        //sortByTitle
-        String s = list.stream()
-                .sorted(Comparator.comparing(Journal::getTitle))
-                .map(Journal::toString)
-                .collect(Collectors.joining(",\n"));
-
-        Stream<Journal> stream = list.stream();
-        stream = stream.sorted(Comparator.comparing(Journal::getTitle));
-        String s1 = stream.map(Journal::toString)
-                .collect(Collectors.joining(",\n"));
-
-        System.out.println(s);
-        System.out.println();
-        System.out.println(s1);
+//        String s = list.stream()
+//                .sorted(Comparator.comparing(Journal::getTitle))
+//                .map(Journal::toString)
+//                .collect(Collectors.joining(",\n"));
+//
+//        Stream<Journal> stream = list.stream();
+//        stream = stream.sorted(Comparator.comparing(Journal::getTitle));
+//        String s1 = stream.map(Journal::toString)
+//                .collect(Collectors.joining(",\n"));
+//
+//        System.out.println(s);
+//        System.out.println();
+//        System.out.println(s1);
 
 //        //sortByDate
 //        String s = list.stream()
@@ -163,5 +167,32 @@ public class Main {
 //                .map(Journal::toString)
 //                .collect(Collectors.joining(",\n"));
 //        System.out.println(s);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://quotes15.p.rapidapi.com/quotes/random/"))
+                .header("x-rapidapi-host", "quotes15.p.rapidapi.com")
+                .header("x-rapidapi-key", null)
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(response.body());
+
+
+//        HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://catfact.ninja/fact")).build();
+//        try {
+//            System.out.println(HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 }

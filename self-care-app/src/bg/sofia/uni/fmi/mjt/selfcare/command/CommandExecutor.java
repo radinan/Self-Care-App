@@ -4,12 +4,16 @@ import bg.sofia.uni.fmi.mjt.selfcare.utilities.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//make it builder
 public class CommandExecutor {
     private static final String REGISTER = "register";
     private static final String LOGIN = "login";
@@ -25,11 +29,12 @@ public class CommandExecutor {
     private static final String GET_QUOTE = "get-quote";
 
     private User currentUser;
-    private FileEditor fileEditor;
+    private final FileEditor fileEditor;
 
     public CommandExecutor() {
         currentUser = null;
         fileEditor = new FileEditor();
+//        this.apiKey = apiKey;
     }
 
     public String execute(Command command, User user) {
@@ -233,7 +238,27 @@ public class CommandExecutor {
     }
 
     private String getQuote() {
-        return null;
+        URI uri = URI.create("https://quotes15.p.rapidapi.com/quotes/random/");
+        String hostName = "x-rapidapi-host";
+        String hostValue = "quotes15.p.rapidapi.com";
+        String keyName = "x-rapidapi-key";
+        String keyValue = null;
+        String method = "GET";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header(hostName, hostValue)
+                .header(keyName, keyValue)
+                .method(method, HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        try {
+            //add gson!!!
+            return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body();
+        } catch (Exception e) {
+            return null;
+//            e.printStackTrace();
+        }
     }
 
     private void loadUser(String username) {

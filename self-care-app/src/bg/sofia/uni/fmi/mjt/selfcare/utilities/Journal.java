@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Journal {
     private final String title;
-    private final LocalDate creationDate; //consider format
+    private final LocalDate creationDate;
     private final String content;
 
     public Journal(String title, String content) {

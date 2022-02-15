@@ -1,6 +1,5 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
