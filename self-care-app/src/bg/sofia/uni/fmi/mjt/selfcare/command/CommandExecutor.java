@@ -14,31 +14,31 @@ import java.util.stream.Collectors;
 //make class for initial files creation
 //make it builder
 public class CommandExecutor {
-    //think of getting them in an enum
-    private final String REGISTER = "register";
-    private final String LOGIN = "login";
-    private final String DISCONNECT = "disconnect";
-    private final String CREATE_JOURNAL = "create-journal";
-    private final String LIST_ALL_JOURNALS = "list-all-journals";
-    private final String FIND_BY_TITLE = "find-by-title";
-    private final String FIND_BY_KEYWORDS = "find-by-keywords";
-    private final String FIND_BY_DATE = "find-by-date";
-    private final String SORT_BY_DATE = "sort-by-date";
-    private final String SORT_BY_TITLE = "sort-by-title";
-    private final String GET_QUOTE = "get-quote";
-    private final String CHECK_MOOD = "check-mood";
+    private static final String REGISTER = "register";
+    private static final String LOGIN = "login";
+    private static final String DISCONNECT = "disconnect";
+    private static final String CREATE_JOURNAL = "create-journal";
+    private static final String LIST_ALL_JOURNALS = "list-all-journals";
+    private static final String FIND_BY_TITLE = "find-by-title";
+    private static final String FIND_BY_KEYWORDS = "find-by-keywords";
+    private static final String FIND_BY_DATE = "find-by-date";
+    private static final String SORT_BY_DATE = "sort-by-date";
+    private static final String SORT_BY_TITLE = "sort-by-title";
+    private static final String GET_QUOTE = "get-quote";
 
     private User currentUser;
     private FileEditor fileEditor;
 
     public CommandExecutor() {
+        currentUser = null;
         fileEditor = new FileEditor();
     }
 
-    public String execute(Command command, User user) { //enum responses?
+    public String execute(Command command, User user) {
         currentUser = user;
+
         return switch (command.name()) {
-            case DISCONNECT -> disconnect();
+            case DISCONNECT -> disconnect(); //maybe move outside?
             case REGISTER -> register(command.arguments());
             case LOGIN -> login(command.arguments());
 
@@ -52,7 +52,7 @@ public class CommandExecutor {
 
             case GET_QUOTE -> getQuote();
 
-            default -> "Invalid";
+            default -> "Unknown command";
         };
     }
 
@@ -61,17 +61,17 @@ public class CommandExecutor {
     }
 
     private String register(String arguments) {
-        String[] separatedArguments = CommandParser.parseCredentials(arguments); //make it return a pair
+        String[] separatedArguments = CommandParser.parseCredentials(arguments);
         String username = separatedArguments[0];
         String password = separatedArguments[1];
+        //validate
 
         if (fileEditor.isUsernameFree(username)) {
             fileEditor.addNewUser(username, password);
             loadUser(username);
-            return "Successfully registered.";
+            return String.format("Successfully registered user %s.", username);
         } else {
-            //exception?
-            return "Username is taken";
+            return String.format("Username %s is already taken.", username);
         }
     }
 
@@ -79,12 +79,12 @@ public class CommandExecutor {
         String[] separatedArguments = CommandParser.parseCredentials(arguments);
         String username = separatedArguments[0];
         String password = separatedArguments[1];
+        //validate
 
         if (fileEditor.areCredentialsCorrect(username, password)) {
             loadUser(username);
-            return "Successfully logged in";
+            return String.format("Successfully logged with username %s.", username);
         } else {
-            //exception?
             return "Incorrect credentials.";
         }
     }
@@ -94,7 +94,7 @@ public class CommandExecutor {
         fileEditor.addNewJournal(currentUser.getUsername(), journal);
         currentUser.addJournal(journal);
 
-        return "Success";
+        return String.format("Journal %s successfully added.", journal.getTitle());
     }
 
     private String listAllJournalsTitle() {
@@ -106,7 +106,7 @@ public class CommandExecutor {
 
     private String findByTitle(String argument) {
         String delimiter = ",\n";
-        //parse and validate
+        //validate
         return currentUser.getJournals().stream()
                 .filter(o -> o.getTitle().equals(argument))
                 .map(Journal::toString)
@@ -151,10 +151,17 @@ public class CommandExecutor {
     private String sortByTitle(String arguments) {
         //parse sort arguments
         String delimiter = ",\n";
-        return currentUser.getJournals().stream()
-                .sorted(Comparator.comparing(Journal::getTitle))
-                .map(Journal::toString)
-                .collect(Collectors.joining(delimiter));
+        if (arguments.equals("asc")) {
+            return currentUser.getJournals().stream()
+                    .sorted(Comparator.comparing(Journal::getTitle))
+                    .map(Journal::toString)
+                    .collect(Collectors.joining(delimiter));
+        } else {
+            return currentUser.getJournals().stream()
+                    .sorted(Comparator.comparing(Journal::getTitle).reversed())
+                    .map(Journal::toString)
+                    .collect(Collectors.joining(delimiter));
+        }
     }
 
     private String sortByDate(String arguments) {
@@ -180,22 +187,6 @@ public class CommandExecutor {
     private void loadUser(String username) {
         currentUser.setUsername(username);
         currentUser.login();
-
-        Path path = Path.of("./users/" + username + ".txt");
-
-        if (Files.exists(path)) {
-            List<Journal> fileJournals = new ArrayList<>();
-
-            try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(path.toString()))) {
-                Journal currentJournal;
-                while ((currentJournal = (Journal) is.readObject()) != null) {
-                    fileJournals.add(currentJournal);
-                }
-            } catch (Exception e) {
-                e.printStackTrace(); //change "Unavailable service"
-            }
-
-            currentUser.setJournals(fileJournals);
-        }
+        currentUser.setJournals(fileEditor.getAllJournalsOfUser(username));
     }
 }
