@@ -27,6 +27,10 @@ public class User {
         isLogged = false;
     }
 
+    public boolean isLogged() {
+        return isLogged;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }

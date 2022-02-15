@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 public class CommandExecutor {
     private static final String REGISTER = "register";
     private static final String LOGIN = "login";
+    private static final String LOGOUT = "logout";
     private static final String DISCONNECT = "disconnect";
     private static final String CREATE_JOURNAL = "create-journal";
     private static final String LIST_ALL_JOURNALS = "list-all-journals";
@@ -33,11 +34,33 @@ public class CommandExecutor {
 
     public String execute(Command command, User user) {
         currentUser = user;
+        String commandName = command.name();
 
-        return switch (command.name()) {
+        if (isUserLogged()) {
+            switch (commandName) {
+                case REGISTER:
+                case LOGIN: return "Log out first.";
+            }
+        } else {
+            switch (commandName) {
+                case LOGOUT:
+                case CREATE_JOURNAL:
+                case LIST_ALL_JOURNALS:
+                case FIND_BY_TITLE:
+                case FIND_BY_KEYWORDS:
+                case FIND_BY_DATE:
+                case SORT_BY_TITLE:
+                case SORT_BY_DATE:
+                case GET_QUOTE: return "Log in first";
+            }
+        }
+
+        return switch (commandName) {
             case DISCONNECT -> disconnect(); //maybe move outside?
+
             case REGISTER -> register(command.arguments());
             case LOGIN -> login(command.arguments());
+            case LOGOUT -> logout();
 
             case CREATE_JOURNAL -> createJournal(command.arguments());
             case LIST_ALL_JOURNALS -> listAllJournalsTitle();
@@ -90,6 +113,11 @@ public class CommandExecutor {
         } else {
             return "Incorrect credentials.";
         }
+    }
+
+    private String logout() {
+        currentUser.logout();
+        return "Logged out.";
     }
 
     private String createJournal(String arguments) {
@@ -212,5 +240,9 @@ public class CommandExecutor {
         currentUser.setUsername(username);
         currentUser.login();
         currentUser.setJournals(fileEditor.getAllJournalsOfUser(username));
+    }
+
+    private boolean isUserLogged() {
+        return currentUser != null && currentUser.isLogged();
     }
 }

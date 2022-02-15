@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-//validation in here or outside???
 public class CommandParser {
     public static Map.Entry<String, String> parseCredentials(String arguments) {
         String[] separatedArguments = arguments.split(" ");
