@@ -246,7 +246,7 @@ public class CommandExecutor {
         String hostName = "x-rapidapi-host";
         String hostValue = "quotes15.p.rapidapi.com";
         String keyName = "x-rapidapi-key";
-        String keyValue = null;
+        String keyValue = "546521a681mshd1f6360c43ee772p1d68c4jsna530b58e2c2b";
         String method = "GET";
 
         HttpRequest request = HttpRequest.newBuilder()

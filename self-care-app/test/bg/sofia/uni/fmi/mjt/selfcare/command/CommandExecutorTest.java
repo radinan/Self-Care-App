@@ -1,12 +1,14 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-class CommandExecutorTest {
+@RunWith(MockitoJUnitRunner.class)
+public class CommandExecutorTest {
 
     @Test
-    void execute() {
+    public void execute() {
     }
 }

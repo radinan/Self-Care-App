@@ -1,27 +1,32 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-class CommandCreatorTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+@RunWith(MockitoJUnitRunner.class)
+public class CommandCreatorTest {
 
     @Test
-    void testCreateNull() {
+    public void testCreateNull() {
         String input = null;
         Command command = CommandCreator.create(input);
         assertNull(command);
     }
 
     @Test
-    void testCreateBlank() {
+    public void testCreateBlank() {
         String input = " ";
         Command command = CommandCreator.create(input);
         assertNull(command);
     }
 
     @Test
-    void testCreateOneArg() {
+    public void testCreateOneArg() {
         String input = "argument";
         Command command = CommandCreator.create(input);
         assertEquals(command.name(), input);
@@ -29,7 +34,7 @@ class CommandCreatorTest {
     }
 
     @Test
-    void testCreateManyArgs() {
+    public void testCreateManyArgs() {
         String name = "name";
         String arguments = "argument argument1 argument2";
         String input = name + " " + arguments;
