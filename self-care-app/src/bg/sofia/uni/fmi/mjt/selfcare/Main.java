@@ -168,22 +168,22 @@ public class Main {
 //                .collect(Collectors.joining(",\n"));
 //        System.out.println(s);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://quotes15.p.rapidapi.com/quotes/random/"))
-                .header("x-rapidapi-host", "quotes15.p.rapidapi.com")
-                .header("x-rapidapi-key", null)
-                .method("GET", HttpRequest.BodyPublishers.noBody())
-                .build();
-        HttpResponse<String> response = null;
-        try {
-            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(response.body());
+//        HttpRequest request = HttpRequest.newBuilder()
+//                .uri(URI.create("https://quotes15.p.rapidapi.com/quotes/random/"))
+//                .header("x-rapidapi-host", "quotes15.p.rapidapi.com")
+//                .header("x-rapidapi-key", null)
+//                .method("GET", HttpRequest.BodyPublishers.noBody())
+//                .build();
+//        HttpResponse<String> response = null;
+//        try {
+//            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println(response.body());
 
 
 //        HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://catfact.ninja/fact")).build();

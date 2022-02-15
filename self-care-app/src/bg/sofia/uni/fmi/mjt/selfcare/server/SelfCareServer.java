@@ -1,36 +1,130 @@
 package bg.sofia.uni.fmi.mjt.selfcare.server;
 
+import bg.sofia.uni.fmi.mjt.selfcare.command.CommandCreator;
+import bg.sofia.uni.fmi.mjt.selfcare.command.CommandExecutor;
+import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
+
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.io.UncheckedIOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Set;
 
 public class SelfCareServer {
-    //map socket-user
-    private static final int SERVER_PORT = 4444;
-    private static final int MAX_EXECUTOR_THREADS = 10;
+    private static final String SERVER_HOST = "localhost";
+    private static final int BUFFER_SIZE = 1024;
 
-    public static void main(String[] args) {
-        ExecutorService executor = Executors.newFixedThreadPool(MAX_EXECUTOR_THREADS);
+    private final int port;
+    private ByteBuffer buffer;
+    private Selector selector;
+    private boolean isServerUp;
 
-        try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
+    private final CommandExecutor commandExecutor;
 
-            System.out.println("Server started and listening.");
+    public SelfCareServer(int port, CommandExecutor commandExecutor) {
+        this.port = port;
+        this.commandExecutor = commandExecutor;
+    }
 
-            Socket clientSocket;
+    public void start() {
+        try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open()) {
+            this.selector = Selector.open();
+            configureServerSocketChannel(serverSocketChannel, selector);
+            this.buffer = ByteBuffer.allocate(BUFFER_SIZE);
+            isServerUp = true;
 
-            while (true) {
-                clientSocket = serverSocket.accept();
+            while (isServerUp) {
+                try {
+                    int readyChannels = selector.select();
+                    if (readyChannels == 0) {
+                        continue;
+                    }
 
-                System.out.println("Accepted connection from client: " + clientSocket.getInetAddress());
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
-                ClientRequestHandler clientRequestHandler = new ClientRequestHandler(clientSocket);
+                    while (keyIterator.hasNext()) {
+                        SelectionKey key = keyIterator.next();
 
-                executor.execute(clientRequestHandler);
+                        if (key.isReadable()) {
+                            SocketChannel clientChannel = (SocketChannel) key.channel();
+                            String clientInput = getClientInput(clientChannel);
+
+                            String serverReply =
+                                    commandExecutor.execute(CommandCreator.create(clientInput), new User()); //user??
+
+                            if (serverReply.equals("Disconnected.")) {
+                                writeClientOutput(clientChannel, "Disconnected from the server.");
+                                clientChannel.close();
+                                clientChannel.keyFor(selector).cancel();
+                            } else {
+                                writeClientOutput(clientChannel, serverReply);
+                            }
+                        } else if (key.isAcceptable()) {
+                            accept(selector, key);
+                        }
+
+                        keyIterator.remove();
+                    }
+                } catch (IOException e) {
+                    System.out.println("Error occurred while processing client request: " + e.getMessage());
+                }
             }
         } catch (IOException e) {
-            e.printStackTrace(); //change
+            throw new UncheckedIOException("failed to start server", e);
         }
+    }
+
+    public void stop() {
+        isServerUp = false;
+        if (selector.isOpen()) {
+            selector.wakeup();
+        }
+    }
+
+    private void configureServerSocketChannel(ServerSocketChannel serverSocketChannel,
+                                              Selector selector) throws IOException {
+        serverSocketChannel.bind(new InetSocketAddress(SERVER_HOST, port));
+        serverSocketChannel.configureBlocking(false);
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+    }
+
+    private String getClientInput(SocketChannel clientChannel) throws IOException {
+        buffer.clear();
+
+        int readBytes = clientChannel.read(buffer);
+        if (readBytes < 0) {
+            clientChannel.close();
+            return null;
+        }
+
+        buffer.flip();
+
+        byte[] clientInputBytes = new byte[buffer.remaining()];
+        buffer.get(clientInputBytes);
+
+        return new String(clientInputBytes, StandardCharsets.UTF_8);
+    }
+
+    private void writeClientOutput(SocketChannel clientChannel, String serverReply) throws IOException {
+        buffer.clear();
+        buffer.put(serverReply.getBytes(StandardCharsets.UTF_8));
+        buffer.flip();
+
+        clientChannel.write(buffer);
+    }
+
+    private void accept(Selector selector, SelectionKey key) throws IOException {
+        ServerSocketChannel serverChannel = (ServerSocketChannel) key.channel();
+        SocketChannel accept = serverChannel.accept();
+
+        accept.configureBlocking(false);
+        accept.register(selector, SelectionKey.OP_READ);
     }
 }
