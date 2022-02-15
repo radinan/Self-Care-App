@@ -2,23 +2,28 @@ package bg.sofia.uni.fmi.mjt.selfcare.command;
 
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 //validation in here or outside???
 public class CommandParser {
-    public static String[] parseCredentials(String arguments) {
+    public static Map.Entry<String, String> parseCredentials(String arguments) {
         String[] separatedArguments = arguments.split(" ");
         if (separatedArguments.length != 2) {
 //            throw new Exception();
         }
 
-        return separatedArguments;
+        return new AbstractMap.SimpleEntry<>(separatedArguments[0], separatedArguments[1]);
     }
 
-    public static Journal parseJournal(String arguments) {
+    public static Map.Entry<String, String> parseJournal(String arguments) {
         String[] separatedArguments = arguments.split(" ", 2);
-        return new Journal(separatedArguments[0], separatedArguments[1]);
+        if (separatedArguments.length != 2) {
+//            throw new Exception();
+        }
+        return new AbstractMap.SimpleEntry<>(separatedArguments[0], separatedArguments[1]);
     }
 
     public static List<String> parseKeywords(String arguments) {

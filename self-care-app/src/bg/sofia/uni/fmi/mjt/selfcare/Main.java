@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
@@ -142,10 +143,19 @@ public class Main {
 //                .collect(Collectors.joining(",\n"));
 
 //        //sortByTitle
-//        String s = list.stream()
-//                .sorted(Comparator.comparing(Journal::getTitle))
-//                .map(Journal::toString)
-//                .collect(Collectors.joining(",\n"));
+        String s = list.stream()
+                .sorted(Comparator.comparing(Journal::getTitle))
+                .map(Journal::toString)
+                .collect(Collectors.joining(",\n"));
+
+        Stream<Journal> stream = list.stream();
+        stream = stream.sorted(Comparator.comparing(Journal::getTitle));
+        String s1 = stream.map(Journal::toString)
+                .collect(Collectors.joining(",\n"));
+
+        System.out.println(s);
+        System.out.println();
+        System.out.println(s1);
 
 //        //sortByDate
 //        String s = list.stream()

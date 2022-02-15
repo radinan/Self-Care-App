@@ -4,14 +4,11 @@ import bg.sofia.uni.fmi.mjt.selfcare.utilities.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-//make class for initial files creation
 //make it builder
 public class CommandExecutor {
     private static final String REGISTER = "register";
@@ -61,10 +58,13 @@ public class CommandExecutor {
     }
 
     private String register(String arguments) {
-        String[] separatedArguments = CommandParser.parseCredentials(arguments);
-        String username = separatedArguments[0];
-        String password = separatedArguments[1];
-        //validate
+        Map.Entry<String, String> usernamePasswordPair = CommandParser.parseCredentials(arguments);
+        String username = usernamePasswordPair.getKey();
+        String password = usernamePasswordPair.getValue();
+
+        if (!CommandValidator.isUsernameValid(username) || !CommandValidator.isPasswordValid(password)) {
+            return "Invalid data.";
+        }
 
         if (fileEditor.isUsernameFree(username)) {
             fileEditor.addNewUser(username, password);
@@ -76,21 +76,33 @@ public class CommandExecutor {
     }
 
     private String login(String arguments) {
-        String[] separatedArguments = CommandParser.parseCredentials(arguments);
-        String username = separatedArguments[0];
-        String password = separatedArguments[1];
-        //validate
+        Map.Entry<String, String> usernamePasswordPair = CommandParser.parseCredentials(arguments);
+        String username = usernamePasswordPair.getKey();
+        String password = usernamePasswordPair.getValue();
+
+        if (!CommandValidator.isUsernameValid(username) || !CommandValidator.isPasswordValid(password)) {
+            return "Invalid data.";
+        }
 
         if (fileEditor.areCredentialsCorrect(username, password)) {
             loadUser(username);
-            return String.format("Successfully logged with username %s.", username);
+            return String.format("Successfully logged in with username %s.", username);
         } else {
             return "Incorrect credentials.";
         }
     }
 
     private String createJournal(String arguments) {
-        Journal journal = CommandParser.parseJournal(arguments);
+        Map.Entry<String, String> titleContentParsed = CommandParser.parseJournal(arguments);
+        String title = titleContentParsed.getKey();
+        String content = titleContentParsed.getValue();
+
+        if (!CommandValidator.isTitleValid(title) || !CommandValidator.isContentValid(content)) {
+            return "Invalid data.";
+        }
+
+        Journal journal = new Journal(title, content);
+
         fileEditor.addNewJournal(currentUser.getUsername(), journal);
         currentUser.addJournal(journal);
 
@@ -105,8 +117,11 @@ public class CommandExecutor {
     }
 
     private String findByTitle(String argument) {
+        if (!CommandValidator.isTitleValid(argument)) {
+            return "Invalid data.";
+        }
+
         String delimiter = ",\n";
-        //validate
         return currentUser.getJournals().stream()
                 .filter(o -> o.getTitle().equals(argument))
                 .map(Journal::toString)
@@ -115,6 +130,11 @@ public class CommandExecutor {
 
     private String findByKeywords(String arguments) {
         List<String> keywords = CommandParser.parseKeywords(arguments);
+
+        if (CommandValidator.areKeywordsValid(keywords)) {
+            return "Invalid data.";
+        }
+
         List<Map.Entry<Long, Journal>> journalPairs = new ArrayList<>();
 
         for (Journal journal : currentUser.getJournals()) {
@@ -124,7 +144,7 @@ public class CommandExecutor {
                     .distinct()
                     .toList();
 
-            Long matchCount = keywords.stream().filter(contentWords::contains).count();
+            long matchCount = keywords.stream().filter(contentWords::contains).count();
             if (matchCount > 0) {
                 journalPairs.add(new AbstractMap.SimpleEntry<>(matchCount, journal));
             }
@@ -139,8 +159,12 @@ public class CommandExecutor {
     }
 
     private String findByDate(String argument) {
+        if (!CommandValidator.isDateValid(argument)) {
+            return "Invalid data.";
+        }
+
         LocalDate creationDate = LocalDate.parse(argument);
-        //parse and validate
+
         String delimiter = ",\n";
         return currentUser.getJournals().stream()
                 .filter(o -> o.getCreationDate().equals(creationDate))
@@ -148,36 +172,36 @@ public class CommandExecutor {
                 .collect(Collectors.joining(delimiter));
     }
 
-    private String sortByTitle(String arguments) {
-        //parse sort arguments
-        String delimiter = ",\n";
-        if (arguments.equals("asc")) {
-            return currentUser.getJournals().stream()
-                    .sorted(Comparator.comparing(Journal::getTitle))
-                    .map(Journal::toString)
-                    .collect(Collectors.joining(delimiter));
+    private String sortByTitle(String argument) {
+        Stream<Journal> stream = currentUser.getJournals().stream();
+
+        if (CommandValidator.isAscending(argument)) {
+            stream = stream.sorted(Comparator.comparing(Journal::getTitle));
+        } else if (CommandValidator.isDescending(argument)) {
+            stream = stream.sorted(Comparator.comparing(Journal::getTitle).reversed());
         } else {
-            return currentUser.getJournals().stream()
-                    .sorted(Comparator.comparing(Journal::getTitle).reversed())
-                    .map(Journal::toString)
-                    .collect(Collectors.joining(delimiter));
+            return "Invalid data.";
         }
+
+        String delimiter = ",\n";
+        return stream.map(Journal::toString)
+                .collect(Collectors.joining(delimiter));
     }
 
-    private String sortByDate(String arguments) {
-        //parse sort arguments
-        String delimiter = ",\n";
-        if (arguments.equals("asc")) {
-            return currentUser.getJournals().stream()
-                    .sorted((Comparator.comparing(Journal::getCreationDate)))
-                    .map(Journal::toString)
-                    .collect(Collectors.joining(delimiter));
+    private String sortByDate(String argument) {
+        Stream<Journal> stream = currentUser.getJournals().stream();
+
+        if (CommandValidator.isAscending(argument)) {
+            stream = stream.sorted((Comparator.comparing(Journal::getCreationDate)));
+        } else if (CommandValidator.isDescending(argument)) {
+            stream = stream.sorted((Comparator.comparing(Journal::getCreationDate)).reversed());
         } else {
-            return currentUser.getJournals().stream()
-                    .sorted((Comparator.comparing(Journal::getCreationDate)).reversed())
-                    .map(Journal::toString)
-                    .collect(Collectors.joining(delimiter));
+            return "Invalid data.";
         }
+
+        String delimiter = ",\n";
+        return stream.map(Journal::toString)
+                .collect(Collectors.joining(delimiter));
     }
 
     private String getQuote() {
