@@ -71,7 +71,7 @@ public class CommandValidatorTest {
     @Test
     public void areKeywordsValidTrue() {
         List<String> list = new ArrayList<>();
-        list.add(VALID_CHARS);
+        list.add(VALID_CONTENT);
 
         boolean isValid = CommandValidator.areKeywordsValid(list);
         assertTrue(isValid);

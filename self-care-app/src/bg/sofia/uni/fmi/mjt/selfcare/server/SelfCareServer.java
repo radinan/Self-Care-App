@@ -3,6 +3,7 @@ package bg.sofia.uni.fmi.mjt.selfcare.server;
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandCreator;
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandExecutor;
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
+import bg.sofia.uni.fmi.mjt.selfcare.storage.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
 import java.io.IOException;
@@ -30,9 +31,9 @@ public class SelfCareServer {
     private final Map<Channel, User> channelsToUsers;
 
 
-    public SelfCareServer(int port, CommandExecutor commandExecutor) {
+    public SelfCareServer(int port) {
         this.port = port;
-        this.commandExecutor = commandExecutor;
+        this.commandExecutor = new CommandExecutor(null, new FileEditor());
         this.channelsToUsers = new HashMap<>();
     }
 
@@ -73,7 +74,7 @@ public class SelfCareServer {
                                 } else {
                                     writeClientOutput(clientChannel, serverReply);
                                 }
-                            } catch (RestServerException | FileEditorException e ) {
+                            } catch (RestServerException | FileEditorException e) {
                                 writeClientOutput(clientChannel, "Service unavailable.");
                             } catch (InvalidArgumentException | UnauthorizedException | UnknownCommandException e) {
                                 writeClientOutput(clientChannel, e.getMessage());

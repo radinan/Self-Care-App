@@ -9,6 +9,6 @@ public class CommandCreator {
         String[] elements = input.split(" ", 2);
         return elements.length < 2
                 ? new Command(elements[0], null)
-                : new Command(elements[0] , elements[1]);
+                : new Command(elements[0], elements[1]);
     }
 }

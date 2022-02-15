@@ -51,7 +51,8 @@ public class CommandExecutor {
         if (isUserLogged()) {
             switch (commandName) {
                 case REGISTER:
-                case LOGIN: throw new UnauthorizedException("Log out to perform this action.");
+                case LOGIN:
+                    throw new UnauthorizedException("Log out to perform this action.");
             }
         } else {
             switch (commandName) {
@@ -63,7 +64,8 @@ public class CommandExecutor {
                 case FIND_BY_DATE:
                 case SORT_BY_TITLE:
                 case SORT_BY_DATE:
-                case GET_QUOTE: throw new UnauthorizedException("Log in to perform this action.");
+                case GET_QUOTE:
+                    throw new UnauthorizedException("Log in to perform this action.");
             }
         }
 

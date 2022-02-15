@@ -8,13 +8,13 @@ public class Journal {
     private final String content;
 
     public Journal(String title, String content) {
-        this.title= title;
+        this.title = title;
         this.creationDate = LocalDate.now();
         this.content = content;
     }
 
     public Journal(String title, LocalDate creationDate, String content) {
-        this.title= title;
+        this.title = title;
         this.creationDate = creationDate;
         this.content = content;
     }

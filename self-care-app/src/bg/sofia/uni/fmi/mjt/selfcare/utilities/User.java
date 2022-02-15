@@ -36,7 +36,7 @@ public class User {
     }
 
     public String getUsername() {
-        return  username;
+        return username;
     }
 
     public void setJournals(List<Journal> journals) {

@@ -26,8 +26,8 @@ public class CommandValidator {
         return isNotNullAndMatch(content, ALLOWED_CONTENT_REGEX);
     }
 
-    public static boolean areKeywordsValid(List<String>keywords) {
-        return keywords.stream().allMatch(o -> isNotNullAndMatch(o, ALLOWED_CHARS_REGEX));
+    public static boolean areKeywordsValid(List<String> keywords) {
+        return keywords.stream().allMatch(o -> isNotNullAndMatch(o, ALLOWED_CONTENT_REGEX));
     }
 
     public static boolean isDateValid(String date) {

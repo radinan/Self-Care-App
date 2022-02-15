@@ -1,6 +1,5 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
-
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
 import bg.sofia.uni.fmi.mjt.selfcare.storage.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;

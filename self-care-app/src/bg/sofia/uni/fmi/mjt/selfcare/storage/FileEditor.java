@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileEditor {
-    private final String STORAGE_DIR = "./src/bg/sofia/uni/fmi/mjt/selfcare/storage/";
-    private final String CREDENTIALS = STORAGE_DIR + "credentials.txt";
-    private final String USERS_DIR = STORAGE_DIR + "users/";
-    private final String USER_FILE_POSTFIX = ".txt";
+    private static final String STORAGE_DIR = "./src/bg/sofia/uni/fmi/mjt/selfcare/storage/";
+    private static final String CREDENTIALS = STORAGE_DIR + "credentials.txt";
+    private static final String USERS_DIR = STORAGE_DIR + "users/";
+    private static final String USER_FILE_POSTFIX = ".txt";
 
     public boolean isUsernameFree(String username) throws FileEditorException {
         try (Reader fileReader = new FileReader(CREDENTIALS);
@@ -116,7 +116,7 @@ public class FileEditor {
 
             return allJournals;
         } catch (FileNotFoundException e) {
-            return null;
+            return allJournals;
         } catch (IOException e) {
             throw new FileEditorException(e.getMessage());
         }
@@ -125,7 +125,8 @@ public class FileEditor {
     private void createFile(String path) {
         try {
             Files.createFile(Path.of(path));
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            System.out.println("File exists.");
         }
     }
 }

@@ -1,6 +1,5 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
-
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.InvalidArgumentException;
 
 import java.util.AbstractMap;
