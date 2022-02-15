@@ -1,6 +1,8 @@
 package bg.sofia.uni.fmi.mjt.selfcare;
 
+import bg.sofia.uni.fmi.mjt.selfcare.command.CommandExecutor;
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandParser;
+import bg.sofia.uni.fmi.mjt.selfcare.server.SelfCareServer;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 
 import java.io.*;
@@ -194,5 +196,9 @@ public class Main {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
+
+        SelfCareServer server = new SelfCareServer(7777, new CommandExecutor());
+        server.start();
+
     }
 }

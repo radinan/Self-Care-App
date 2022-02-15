@@ -1,6 +1,7 @@
-package bg.sofia.uni.fmi.mjt.selfcare.utilities;
+package bg.sofia.uni.fmi.mjt.selfcare.storage;
 
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.FileEditorException;
+import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -28,7 +29,9 @@ public class FileEditor {
             }
 
             return true;
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
+            return true;
+        } catch (IOException e) {
             throw new FileEditorException(e.getMessage());
         }
     }
@@ -47,7 +50,9 @@ public class FileEditor {
             }
 
             return false;
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
+            return false;
+        } catch (IOException e) {
             throw new FileEditorException(e.getMessage());
         }
     }
@@ -63,7 +68,7 @@ public class FileEditor {
 
             writer.write(password);
             writer.newLine();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new FileEditorException(e.getMessage());
         }
     }
@@ -83,7 +88,7 @@ public class FileEditor {
 
             writer.write(journal.getContent());
             writer.newLine();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new FileEditorException(e.getMessage());
         }
     }
@@ -109,7 +114,9 @@ public class FileEditor {
             }
 
             return allJournals;
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
+            return null;
+        } catch (IOException e) {
             throw new FileEditorException(e.getMessage());
         }
     }

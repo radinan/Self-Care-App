@@ -1,7 +1,7 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.FileEditor;
+import bg.sofia.uni.fmi.mjt.selfcare.storage.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
@@ -244,7 +244,7 @@ public class CommandExecutor {
         String hostName = "x-rapidapi-host";
         String hostValue = "quotes15.p.rapidapi.com";
         String keyName = "x-rapidapi-key";
-        String keyValue = null;
+        String keyValue = "546521a681mshd1f6360c43ee772p1d68c4jsna530b58e2c2b";
         String method = "GET";
 
         HttpRequest request = HttpRequest.newBuilder()
