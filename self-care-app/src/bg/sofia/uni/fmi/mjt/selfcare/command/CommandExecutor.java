@@ -33,14 +33,17 @@ public class CommandExecutor {
     private User currentUser;
     private final FileEditor fileEditor;
 
-    public CommandExecutor() {
-        currentUser = null;
-        fileEditor = new FileEditor();
-//        this.apiKey = apiKey;
+    public CommandExecutor(User currentUser, FileEditor fileEditor) {
+        this.currentUser = currentUser;
+        this.fileEditor = fileEditor;
     }
 
     public String execute(Command command, User user) throws InvalidArgumentException, FileEditorException,
             RestServerException, UnauthorizedException, UnknownCommandException {
+
+        if (command == null || command.name() == null) {
+            throw new UnknownCommandException("Unknown command.");
+        }
 
         currentUser = user;
         String commandName = command.name();
@@ -168,7 +171,7 @@ public class CommandExecutor {
     private String findByKeywords(String arguments) throws InvalidArgumentException {
         List<String> keywords = CommandParser.parseKeywords(arguments);
 
-        if (CommandValidator.areKeywordsValid(keywords)) {
+        if (!CommandValidator.areKeywordsValid(keywords)) {
             throw new InvalidArgumentException("Invalid arguments.");
         }
 

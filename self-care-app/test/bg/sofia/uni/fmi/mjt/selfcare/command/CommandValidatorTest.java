@@ -12,16 +12,10 @@ import static org.junit.Assert.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CommandValidatorTest {
     private final static String VALID_CHARS = "Aa0.-_";
-    private final static String INVALID_CHARS = " *";
-
     private final static String VALID_PASSWORD = "Aa0*@_";
-    private final static String INVALID_PASSWORD = "  ";
-
     private final static String VALID_CONTENT = "Aa0 .?!,_-";
-    private final static String INVALID_CONTENT = "}";
-
-    private final static String VALID_DATE = "10.10.2020";
-    private final static String INVALID_DATE = "2.5.4";
+    private final static String VALID_DATE = "2020-10-10";
+    private final static String INVALID = null;
 
     private final static String ASCENDING = "asc";
     private final static String DESCENDING = "desc";
@@ -34,7 +28,7 @@ public class CommandValidatorTest {
 
     @Test
     public void testIsUsernameValidFalse() {
-        boolean isValid = CommandValidator.isUsernameValid(INVALID_CHARS);
+        boolean isValid = CommandValidator.isUsernameValid(INVALID);
         assertFalse(isValid);
     }
 
@@ -46,7 +40,7 @@ public class CommandValidatorTest {
 
     @Test
     public void isPasswordValidFalse() {
-        boolean isValid = CommandValidator.isPasswordValid(INVALID_PASSWORD);
+        boolean isValid = CommandValidator.isPasswordValid(INVALID);
         assertFalse(isValid);
     }
 
@@ -58,7 +52,7 @@ public class CommandValidatorTest {
 
     @Test
     public void isTitleValidFalse() {
-        boolean isValid = CommandValidator.isTitleValid(INVALID_CHARS);
+        boolean isValid = CommandValidator.isTitleValid(INVALID);
         assertFalse(isValid);
     }
 
@@ -70,7 +64,7 @@ public class CommandValidatorTest {
 
     @Test
     public void isContentValidFalse() {
-        boolean isValid = CommandValidator.isContentValid(INVALID_CONTENT);
+        boolean isValid = CommandValidator.isContentValid(INVALID);
         assertFalse(isValid);
     }
 
@@ -86,7 +80,7 @@ public class CommandValidatorTest {
     @Test
     public void areKeywordsValidFalse() {
         List<String> list = new ArrayList<>();
-        list.add(INVALID_CHARS);
+        list.add(INVALID);
 
         boolean isValid = CommandValidator.areKeywordsValid(list);
         assertFalse(isValid);
@@ -100,7 +94,7 @@ public class CommandValidatorTest {
 
     @Test
     public void isDateValidFalse() {
-        boolean isValid = CommandValidator.isDateValid(INVALID_DATE);
+        boolean isValid = CommandValidator.isDateValid(INVALID);
         assertFalse(isValid);
     }
 
