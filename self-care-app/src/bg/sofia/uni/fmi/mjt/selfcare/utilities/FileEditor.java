@@ -1,5 +1,7 @@
 package bg.sofia.uni.fmi.mjt.selfcare.utilities;
 
+import bg.sofia.uni.fmi.mjt.selfcare.exceptions.FileEditorException;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,7 +14,7 @@ public class FileEditor {
     private final String USERS_DIR = "./users/";
     private final String USER_FILE_POSTFIX = ".txt";
 
-    public boolean isUsernameFree(String username) {
+    public boolean isUsernameFree(String username) throws FileEditorException {
         try (Reader fileReader = new FileReader(CREDENTIALS);
              BufferedReader reader = new BufferedReader(fileReader)) {
 
@@ -24,16 +26,14 @@ public class FileEditor {
                     return false;
                 }
             }
-        } catch (FileNotFoundException e) {
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return true;
+            return true;
+        } catch (Exception e) {
+            throw new FileEditorException(e.getMessage());
+        }
     }
 
-    public boolean areCredentialsCorrect(String username, String password) {
+    public boolean areCredentialsCorrect(String username, String password) throws FileEditorException {
         try (Reader fileReader = new FileReader(CREDENTIALS);
              BufferedReader reader = new BufferedReader(fileReader)) {
 
@@ -45,16 +45,14 @@ public class FileEditor {
                     return true;
                 }
             }
-        } catch (FileNotFoundException e) {
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            throw new FileEditorException(e.getMessage());
+        }
     }
 
-    public void addNewUser(String username, String password) {
+    public void addNewUser(String username, String password) throws FileEditorException {
         createFile(CREDENTIALS);
 
         try (Writer fileWriter = new FileWriter(CREDENTIALS, true);
@@ -65,12 +63,12 @@ public class FileEditor {
 
             writer.write(password);
             writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new FileEditorException(e.getMessage());
         }
     }
 
-    public void addNewJournal(String username, Journal journal) {
+    public void addNewJournal(String username, Journal journal) throws FileEditorException {
         String pathToUserFile = USERS_DIR + username + USER_FILE_POSTFIX;
         createFile(pathToUserFile);
 
@@ -85,12 +83,12 @@ public class FileEditor {
 
             writer.write(journal.getContent());
             writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new FileEditorException(e.getMessage());
         }
     }
 
-    public List<Journal> getAllJournalsOfUser(String username) {
+    public List<Journal> getAllJournalsOfUser(String username) throws FileEditorException {
         String pathToUserFile = USERS_DIR + username + USER_FILE_POSTFIX;
 
         List<Journal> allJournals = new ArrayList<>();
@@ -109,19 +107,17 @@ public class FileEditor {
                 Journal journal = new Journal(title, LocalDate.parse(date), content);
                 allJournals.add(journal);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return allJournals;
+            return allJournals;
+        } catch (Exception e) {
+            throw new FileEditorException(e.getMessage());
+        }
     }
 
     private void createFile(String path) {
         try {
             Files.createFile(Path.of(path));
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
     }
 }

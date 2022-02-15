@@ -1,10 +1,10 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
+import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -37,14 +37,16 @@ public class CommandExecutor {
 //        this.apiKey = apiKey;
     }
 
-    public String execute(Command command, User user) {
+    public String execute(Command command, User user) throws InvalidArgumentException, FileEditorException,
+            RestServerException, UnauthorizedException, UnknownCommandException {
+
         currentUser = user;
         String commandName = command.name();
 
         if (isUserLogged()) {
             switch (commandName) {
                 case REGISTER:
-                case LOGIN: return "Log out first.";
+                case LOGIN: throw new UnauthorizedException("Log out to perform this action.");
             }
         } else {
             switch (commandName) {
@@ -56,12 +58,12 @@ public class CommandExecutor {
                 case FIND_BY_DATE:
                 case SORT_BY_TITLE:
                 case SORT_BY_DATE:
-                case GET_QUOTE: return "Log in first";
+                case GET_QUOTE: throw new UnauthorizedException("Log in to perform this action.");
             }
         }
 
         return switch (commandName) {
-            case DISCONNECT -> disconnect(); //maybe move outside?
+            case DISCONNECT -> disconnect();
 
             case REGISTER -> register(command.arguments());
             case LOGIN -> login(command.arguments());
@@ -77,7 +79,7 @@ public class CommandExecutor {
 
             case GET_QUOTE -> getQuote();
 
-            default -> "Unknown command";
+            default -> throw new UnknownCommandException("Unknown command.");
         };
     }
 
@@ -85,13 +87,13 @@ public class CommandExecutor {
         return "Disconnected.";
     }
 
-    private String register(String arguments) {
+    private String register(String arguments) throws InvalidArgumentException, FileEditorException {
         Map.Entry<String, String> usernamePasswordPair = CommandParser.parseCredentials(arguments);
         String username = usernamePasswordPair.getKey();
         String password = usernamePasswordPair.getValue();
 
         if (!CommandValidator.isUsernameValid(username) || !CommandValidator.isPasswordValid(password)) {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid arguments.");
         }
 
         if (fileEditor.isUsernameFree(username)) {
@@ -99,24 +101,24 @@ public class CommandExecutor {
             loadUser(username);
             return String.format("Successfully registered user %s.", username);
         } else {
-            return String.format("Username %s is already taken.", username);
+            throw new UsernameTakenException(String.format("Username %s is already taken.", username));
         }
     }
 
-    private String login(String arguments) {
+    private String login(String arguments) throws InvalidArgumentException, FileEditorException {
         Map.Entry<String, String> usernamePasswordPair = CommandParser.parseCredentials(arguments);
         String username = usernamePasswordPair.getKey();
         String password = usernamePasswordPair.getValue();
 
         if (!CommandValidator.isUsernameValid(username) || !CommandValidator.isPasswordValid(password)) {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid arguments.");
         }
 
         if (fileEditor.areCredentialsCorrect(username, password)) {
             loadUser(username);
             return String.format("Successfully logged in with username %s.", username);
         } else {
-            return "Incorrect credentials.";
+            throw new WrongCredentialsException("Incorrect credentials.");
         }
     }
 
@@ -125,13 +127,13 @@ public class CommandExecutor {
         return "Logged out.";
     }
 
-    private String createJournal(String arguments) {
+    private String createJournal(String arguments) throws InvalidArgumentException, FileEditorException {
         Map.Entry<String, String> titleContentParsed = CommandParser.parseJournal(arguments);
         String title = titleContentParsed.getKey();
         String content = titleContentParsed.getValue();
 
         if (!CommandValidator.isTitleValid(title) || !CommandValidator.isContentValid(content)) {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid arguments.");
         }
 
         Journal journal = new Journal(title, content);
@@ -149,9 +151,9 @@ public class CommandExecutor {
                 .collect(Collectors.joining(delimiter));
     }
 
-    private String findByTitle(String argument) {
+    private String findByTitle(String argument) throws InvalidArgumentException {
         if (!CommandValidator.isTitleValid(argument)) {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid arguments.");
         }
 
         String delimiter = ",\n";
@@ -161,11 +163,11 @@ public class CommandExecutor {
                 .collect(Collectors.joining(delimiter));
     }
 
-    private String findByKeywords(String arguments) {
+    private String findByKeywords(String arguments) throws InvalidArgumentException {
         List<String> keywords = CommandParser.parseKeywords(arguments);
 
         if (CommandValidator.areKeywordsValid(keywords)) {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid arguments.");
         }
 
         List<Map.Entry<Long, Journal>> journalPairs = new ArrayList<>();
@@ -191,9 +193,9 @@ public class CommandExecutor {
                 .collect(Collectors.joining(delimiter));
     }
 
-    private String findByDate(String argument) {
+    private String findByDate(String argument) throws InvalidArgumentException {
         if (!CommandValidator.isDateValid(argument)) {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid arguments.");
         }
 
         LocalDate creationDate = LocalDate.parse(argument);
@@ -205,7 +207,7 @@ public class CommandExecutor {
                 .collect(Collectors.joining(delimiter));
     }
 
-    private String sortByTitle(String argument) {
+    private String sortByTitle(String argument) throws InvalidArgumentException {
         Stream<Journal> stream = currentUser.getJournals().stream();
 
         if (CommandValidator.isAscending(argument)) {
@@ -213,7 +215,7 @@ public class CommandExecutor {
         } else if (CommandValidator.isDescending(argument)) {
             stream = stream.sorted(Comparator.comparing(Journal::getTitle).reversed());
         } else {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid argument.");
         }
 
         String delimiter = ",\n";
@@ -221,7 +223,7 @@ public class CommandExecutor {
                 .collect(Collectors.joining(delimiter));
     }
 
-    private String sortByDate(String argument) {
+    private String sortByDate(String argument) throws InvalidArgumentException {
         Stream<Journal> stream = currentUser.getJournals().stream();
 
         if (CommandValidator.isAscending(argument)) {
@@ -229,7 +231,7 @@ public class CommandExecutor {
         } else if (CommandValidator.isDescending(argument)) {
             stream = stream.sorted((Comparator.comparing(Journal::getCreationDate)).reversed());
         } else {
-            return "Invalid data.";
+            throw new InvalidArgumentException("Invalid argument.");
         }
 
         String delimiter = ",\n";
@@ -237,7 +239,7 @@ public class CommandExecutor {
                 .collect(Collectors.joining(delimiter));
     }
 
-    private String getQuote() {
+    private String getQuote() throws RestServerException {
         URI uri = URI.create("https://quotes15.p.rapidapi.com/quotes/random/");
         String hostName = "x-rapidapi-host";
         String hostValue = "quotes15.p.rapidapi.com";
@@ -256,12 +258,11 @@ public class CommandExecutor {
             //add gson!!!
             return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body();
         } catch (Exception e) {
-            return null;
-//            e.printStackTrace();
+            throw new RestServerException("Problem with quotes server.");
         }
     }
 
-    private void loadUser(String username) {
+    private void loadUser(String username) throws FileEditorException {
         currentUser.setUsername(username);
         currentUser.login();
         currentUser.setJournals(fileEditor.getAllJournalsOfUser(username));

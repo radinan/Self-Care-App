@@ -2,6 +2,7 @@ package bg.sofia.uni.fmi.mjt.selfcare.server;
 
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandCreator;
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandExecutor;
+import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
 
 import java.io.IOException;
@@ -59,17 +60,23 @@ public class SelfCareServer {
                             SocketChannel clientChannel = (SocketChannel) key.channel();
                             String clientInput = getClientInput(clientChannel);
 
-                            String serverReply = commandExecutor.execute(CommandCreator.create(clientInput),
-                                            channelsToUsers.get(clientChannel));
+                            try {
+                                String serverReply = commandExecutor.execute(CommandCreator.create(clientInput),
+                                        channelsToUsers.get(clientChannel));
 
-                            if (serverReply.equals("Disconnected.")) {
-                                writeClientOutput(clientChannel, "Disconnected from the server.");
-                                clientChannel.close();
-                                clientChannel.keyFor(selector).cancel();
+                                if (serverReply.equals("Disconnected.")) {
+                                    writeClientOutput(clientChannel, "Disconnected from the server.");
+                                    clientChannel.close();
+                                    clientChannel.keyFor(selector).cancel();
 
-                                channelsToUsers.remove(clientChannel);
-                            } else {
-                                writeClientOutput(clientChannel, serverReply);
+                                    channelsToUsers.remove(clientChannel);
+                                } else {
+                                    writeClientOutput(clientChannel, serverReply);
+                                }
+                            } catch (RestServerException | FileEditorException e ) {
+                                writeClientOutput(clientChannel, "Service unavailable.");
+                            } catch (InvalidArgumentException | UnauthorizedException | UnknownCommandException e) {
+                                writeClientOutput(clientChannel, e.getMessage());
                             }
                         } else if (key.isAcceptable()) {
                             accept(selector, key);
@@ -82,7 +89,7 @@ public class SelfCareServer {
                 }
             }
         } catch (IOException e) {
-            throw new UncheckedIOException("failed to start server", e);
+            throw new UncheckedIOException("Failed to start server", e);
         }
     }
 
