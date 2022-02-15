@@ -8,12 +8,11 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class SelfCareServer {
@@ -27,9 +26,13 @@ public class SelfCareServer {
 
     private final CommandExecutor commandExecutor;
 
+    private final Map<Channel, User> channelsToUsers;
+
+
     public SelfCareServer(int port, CommandExecutor commandExecutor) {
         this.port = port;
         this.commandExecutor = commandExecutor;
+        this.channelsToUsers = new HashMap<>();
     }
 
     public void start() {
@@ -56,13 +59,15 @@ public class SelfCareServer {
                             SocketChannel clientChannel = (SocketChannel) key.channel();
                             String clientInput = getClientInput(clientChannel);
 
-                            String serverReply =
-                                    commandExecutor.execute(CommandCreator.create(clientInput), new User()); //user??
+                            String serverReply = commandExecutor.execute(CommandCreator.create(clientInput),
+                                            channelsToUsers.get(clientChannel));
 
                             if (serverReply.equals("Disconnected.")) {
                                 writeClientOutput(clientChannel, "Disconnected from the server.");
                                 clientChannel.close();
                                 clientChannel.keyFor(selector).cancel();
+
+                                channelsToUsers.remove(clientChannel);
                             } else {
                                 writeClientOutput(clientChannel, serverReply);
                             }
@@ -126,5 +131,13 @@ public class SelfCareServer {
 
         accept.configureBlocking(false);
         accept.register(selector, SelectionKey.OP_READ);
+
+        updateChannelsToUsers(accept);
+    }
+
+    private void updateChannelsToUsers(Channel channel) {
+        if (!channelsToUsers.containsKey(channel)) {
+            channelsToUsers.put(channel, new User());
+        }
     }
 }
