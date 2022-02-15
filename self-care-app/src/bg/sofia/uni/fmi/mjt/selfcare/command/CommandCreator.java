@@ -2,7 +2,7 @@ package bg.sofia.uni.fmi.mjt.selfcare.command;
 
 public class CommandCreator {
     public static Command create(String input) {
-        if (input == null) {
+        if (input == null || input.isBlank()) {
             return null;
         }
 

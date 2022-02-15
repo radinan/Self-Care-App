@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileEditor {
-    private final String CREDENTIALS = "./credentials.txt";
-    private final String USERS_DIR = "./users/";
+    private final String STORAGE_DIR = "./src/bg/sofia/uni/fmi/mjt/selfcare/storage/";
+    private final String CREDENTIALS = STORAGE_DIR + "credentials.txt";
+    private final String USERS_DIR = STORAGE_DIR + "users/";
     private final String USER_FILE_POSTFIX = ".txt";
 
     public boolean isUsernameFree(String username) throws FileEditorException {

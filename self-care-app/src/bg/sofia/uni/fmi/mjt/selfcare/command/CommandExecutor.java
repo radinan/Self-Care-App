@@ -3,7 +3,9 @@ package bg.sofia.uni.fmi.mjt.selfcare.command;
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
 import bg.sofia.uni.fmi.mjt.selfcare.storage.FileEditor;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
+import bg.sofia.uni.fmi.mjt.selfcare.utilities.Quote;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
+import com.google.gson.Gson;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -244,7 +246,7 @@ public class CommandExecutor {
         String hostName = "x-rapidapi-host";
         String hostValue = "quotes15.p.rapidapi.com";
         String keyName = "x-rapidapi-key";
-        String keyValue = "546521a681mshd1f6360c43ee772p1d68c4jsna530b58e2c2b";
+        String keyValue = null;
         String method = "GET";
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -255,8 +257,10 @@ public class CommandExecutor {
                 .build();
 
         try {
-            //add gson!!!
-            return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).body();
+            Gson gson = new Gson();
+            Quote quote = gson.fromJson(HttpClient.newHttpClient()
+                    .send(request, HttpResponse.BodyHandlers.ofString()).body(), Quote.class);
+            return quote.getContent();
         } catch (Exception e) {
             throw new RestServerException("Problem with quotes server.");
         }

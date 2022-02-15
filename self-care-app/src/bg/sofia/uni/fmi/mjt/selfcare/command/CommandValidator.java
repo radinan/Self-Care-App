@@ -28,10 +28,10 @@ public class CommandValidator {
     }
 
     public static boolean isAscending(String argument) {
-        return true;
+        return argument.equals("asc");
     }
 
     public static boolean isDescending(String argument) {
-        return true;
+        return argument.equals("desc");
     }
 }

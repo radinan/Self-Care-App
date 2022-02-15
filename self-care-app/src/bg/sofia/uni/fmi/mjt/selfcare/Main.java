@@ -2,8 +2,11 @@ package bg.sofia.uni.fmi.mjt.selfcare;
 
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandExecutor;
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandParser;
+import bg.sofia.uni.fmi.mjt.selfcare.exceptions.RestServerException;
 import bg.sofia.uni.fmi.mjt.selfcare.server.SelfCareServer;
 import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
+import bg.sofia.uni.fmi.mjt.selfcare.utilities.Quote;
+import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.URI;
@@ -100,8 +103,8 @@ public class Main {
         System.out.println();*/
 
         List<Journal> list = new ArrayList<>();
-        list.add(new Journal("aabc", LocalDate.of(2020,12,1), "aa"));
-        list.add(new Journal("aabb", LocalDate.of(2020, 12, 1) ,"aa bb aa"));
+        list.add(new Journal("aabc", LocalDate.of(2020, 12, 1), "aa"));
+        list.add(new Journal("aabb", LocalDate.of(2020, 12, 1), "aa bb aa"));
         list.add(new Journal("cc", LocalDate.of(2022, 12, 1), "of"));
 
 ////listAllJournalsTitle
@@ -197,8 +200,7 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        SelfCareServer server = new SelfCareServer(7777, new CommandExecutor());
-        server.start();
-
+//        SelfCareServer server = new SelfCareServer(7777, new CommandExecutor());
+//        server.start();
     }
 }
