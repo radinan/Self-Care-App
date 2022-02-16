@@ -2,8 +2,8 @@ package bg.sofia.uni.fmi.mjt.selfcare.command;
 
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
 import bg.sofia.uni.fmi.mjt.selfcare.storage.FileEditor;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
+import bg.sofia.uni.fmi.mjt.selfcare.entities.Journal;
+import bg.sofia.uni.fmi.mjt.selfcare.entities.User;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,9 +43,6 @@ public class CommandExecutorTest {
 
     @Mock
     private User userMock;
-
-//    @Mock
-//    private Command commandMock;
 
     @InjectMocks
     private CommandExecutor commandExecutor;

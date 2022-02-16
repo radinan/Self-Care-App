@@ -1,4 +1,4 @@
-package bg.sofia.uni.fmi.mjt.selfcare.utilities;
+package bg.sofia.uni.fmi.mjt.selfcare.entities;
 
 import java.time.LocalDate;
 

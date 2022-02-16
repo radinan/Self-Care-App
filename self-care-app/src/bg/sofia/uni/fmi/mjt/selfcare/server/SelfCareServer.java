@@ -4,7 +4,7 @@ import bg.sofia.uni.fmi.mjt.selfcare.command.CommandCreator;
 import bg.sofia.uni.fmi.mjt.selfcare.command.CommandExecutor;
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
 import bg.sofia.uni.fmi.mjt.selfcare.storage.FileEditor;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
+import bg.sofia.uni.fmi.mjt.selfcare.entities.User;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -86,7 +86,7 @@ public class SelfCareServer {
                         keyIterator.remove();
                     }
                 } catch (IOException e) {
-                    System.out.println("Error occurred while processing client request: " + e.getMessage());
+                    System.out.println("Error occurred while processing client request: " + e.getMessage()); //rethrow
                 }
             }
         } catch (IOException e) {

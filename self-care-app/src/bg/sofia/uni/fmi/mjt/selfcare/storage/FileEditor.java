@@ -1,7 +1,7 @@
 package bg.sofia.uni.fmi.mjt.selfcare.storage;
 
 import bg.sofia.uni.fmi.mjt.selfcare.exceptions.FileEditorException;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
+import bg.sofia.uni.fmi.mjt.selfcare.entities.Journal;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,7 +14,7 @@ public class FileEditor {
     private static final String STORAGE_DIR = "./src/bg/sofia/uni/fmi/mjt/selfcare/storage/";
     private static final String CREDENTIALS = STORAGE_DIR + "credentials.txt";
     private static final String USERS_DIR = STORAGE_DIR + "users/";
-    private static final String USER_FILE_POSTFIX = ".txt";
+    private static final String USER_FILE_POSTFIX = ".txt"; //best to use json inside; good to use csv
 
     public boolean isUsernameFree(String username) throws FileEditorException {
         try (Reader fileReader = new FileReader(CREDENTIALS);

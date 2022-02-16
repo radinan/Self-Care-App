@@ -25,7 +25,7 @@ public class SelfCareClient {
                 System.out.print("Enter message: ");
                 String message = scanner.nextLine();
 
-                System.out.println(message);
+//                System.out.println(message);
                 BUFFER.clear();
                 BUFFER.put(message.getBytes(StandardCharsets.UTF_8));
                 BUFFER.flip();

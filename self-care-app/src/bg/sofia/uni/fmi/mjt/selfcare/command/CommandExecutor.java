@@ -1,10 +1,10 @@
 package bg.sofia.uni.fmi.mjt.selfcare.command;
 
-import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*;
+import bg.sofia.uni.fmi.mjt.selfcare.exceptions.*; //bad practice; explicitly include all of them
 import bg.sofia.uni.fmi.mjt.selfcare.storage.FileEditor;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.Journal;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.Quote;
-import bg.sofia.uni.fmi.mjt.selfcare.utilities.User;
+import bg.sofia.uni.fmi.mjt.selfcare.entities.Journal;
+import bg.sofia.uni.fmi.mjt.selfcare.entities.Quote;
+import bg.sofia.uni.fmi.mjt.selfcare.entities.User;
 import com.google.gson.Gson;
 
 import java.net.URI;
@@ -262,7 +262,7 @@ public class CommandExecutor {
                 .build();
 
         try {
-            Gson gson = new Gson();
+            Gson gson = new Gson(); //field
             Quote quote = gson.fromJson(HttpClient.newHttpClient()
                     .send(request, HttpResponse.BodyHandlers.ofString()).body(), Quote.class);
             return quote.getContent();
