@@ -1,4 +1,5 @@
 # Self-Care-App
+Java application, which is motivated by the importance of self care and self love. It allows creating accounts, getting motivational quotes, and adding, filtering, and sorting personal journals. There are a set of commands that can be executed in the console after starting the application. Important functionalities that I learned from the MJT course are to be seen in the implementation as well as good architecture, clean code conventions and unit tests.
 
 ### Commands
 - **register** - _if `<username>` is free_
